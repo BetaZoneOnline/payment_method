@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="google" content="notranslate">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Let's Deposit Amount</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 1.5rem;
+      padding: 5%;
+      box-shadow: 0 2vw 3vw rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    h2 {
+      font-size: 6vw;
+      margin-bottom: 4vw;
+      background: linear-gradient(135deg, #FFD700 50%, #FF4500 50%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+    }
+    label {
+      font-size: 5vw;
+      display: block;
+      margin-bottom: 3vw;
+      background: linear-gradient(135deg, #ffffff 50%, #ff00d0 50%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+    }
+    input[type="number"] {
+      width: 90%;
+      padding: 3vw;
+      font-size: 4.5vw;
+      border: 1vw solid rgba(255, 255, 255, 0.3);
+      border-radius: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      text-align: center;
+      margin-bottom: 3vw;
+      transition: border-color 0.3s ease;
+      height: 8vw;
+    }
+    input[type="number"]:focus {
+      border-color: #fff;
+      outline: none;
+    }
+    input[type="number"]::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 4.5vw;
+    }
+    /* PayPal Button Container */
+    #paypal-button-container {
+      margin-top: 2vw;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      transform: scale(1);
+      transform-origin: top center;
+    }
+    /* Success Message */
+    #success-message {
+      display: none;
+      padding: 20px;
+      background: rgba(0, 255, 127, 0.8);
+      color: white;
+      font-size: 5vw;
+      border-radius: 10px;
+      margin-top: 5vw;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 5% 3%;
+        width: 90%;
+        max-width: 90%;
+      }
+      h2 {
+        font-size: 8vw;
+      }
+      label {
+        font-size: 6vw;
+      }
+      input[type="number"] {
+        font-size: 5vw;
+        padding: 4vw;
+        height: 7vw;
+      }
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 5% 2%;
+      }
+      h2 {
+        font-size: 10vw;
+      }
+      label {
+        font-size: 7vw;
+      }
+      input[type="number"] {
+        font-size: 6vw;
+        padding: 5vw;
+        height: 8vw;
+      }
+      #paypal-button-container {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Let's Deposit!</h2>
+    <label for="amount">Amount</label>
+    <input type="number" id="amount" placeholder="Type your Amount" required>
+    <input type="hidden" id="userns">
+    <div id="paypal-button-container"></div>
+    <div id="success-message"></div>
+  </div>
+
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AfPcLCpTYQBJvWbbehzLG6gZe7a5kNxeni2RJo-_ReDOe4GhXJEGLSb7qUK5LbCMO2FtVdZpxjWP8uA0&components=buttons,funding-eligibility&enable-funding=venmo,applepay&disable-funding=paylater"></script>
+
+  <script>
+    // Function to get a URL parameter by name
+    function getQueryParam(param) {
+      var params = new URLSearchParams(window.location.search);
+      return params.get(param);
+    }
+
+    // When the DOM loads, autofill the form fields from URL parameters
+    document.addEventListener("DOMContentLoaded", function() {
+      var userns = getQueryParam('userns') || "";
+      var amountParam = getQueryParam('amount') || "";
+
+      // Set the hidden userns field
+      document.getElementById("userns").value = userns;
+      
+      // If a valid amount is provided, prefill the amount input
+      if (amountParam && !isNaN(amountParam)) {
+        document.getElementById("amount").value = parseInt(amountParam, 10);
+      }
+    });
+
+    // Load PayPal buttons
+    function loadPayPalButtons() {
+      paypal.Buttons({
+        style: {
+          layout: "vertical",
+          color: "gold",
+          shape: "rect",
+          label: "paypal",
+          tagline: false,
+          height: 55,
+        },
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            intent: "CAPTURE",
+            purchase_units: [{
+              amount: {
+                value: document.getElementById("amount").value || "1"
+              },
+              custom_id: document.getElementById("userns").value
+            }],
+            application_context: {
+              shipping_preference: "NO_SHIPPING",
+              user_action: "PAY_NOW"
+            }
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            document.getElementById("paypal-button-container").style.display = "none";
+            document.getElementById("success-message").style.display = "block";
+            document.getElementById("success-message").innerText =
+              "✅ Transaction completed by " + details.payer.name.given_name;
+            console.log("Order details:", details);
+          });
+        },
+        onError: function(err) {
+          console.error("Error rendering PayPal Buttons:", err);
+        }
+      }).render("#paypal-button-container");
+    }
+
+    // Initialize PayPal buttons once the page loads
+    window.onload = loadPayPalButtons;
+  </script>
+</body>
+</html>
