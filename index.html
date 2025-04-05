@@ -3,10 +3,15 @@
 <head>
   <meta name="google" content="notranslate">
   <meta charset="UTF-8">
+  <!-- The following meta tags may help with iPhone/iOS display -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <title>Let's Deposit Amount</title>
   <!-- Google Fonts for modern typography -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+
   <style>
     /* Animated Gradient Background */
     body {
@@ -24,8 +29,8 @@
       overflow-x: hidden;
     }
     @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
     
@@ -64,30 +69,53 @@
       -webkit-text-fill-color: transparent;
     }
     
-    input[type="number"] {
+    input[type="number"],
+    select {
       width: 95%;
       padding: 1rem;
       font-size: 1.2rem;
       border: 2.5px solid rgba(255, 255, 255, 0.5);
       border-radius: 0.5rem;
-      background: rgba(255, 255, 255, 0.1);
+      /* Gradient background for the closed dropdown */
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientBGDD 10s ease infinite;
       color: #fff;
       text-align: center;
       margin-bottom: 1.5rem;
       transition: border-color 0.1s ease, box-shadow 0.1s ease;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
     }
-    /* Brighter placeholder text color */
+    /* Keyframes for the dropdown background */
+    @keyframes gradientBGDD {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Brighter placeholder text color for the amount input */
     input[type="number"]::placeholder {
       color: #FFD700;
       opacity: 1;
     }
-    input[type="number"]:focus {
+    input[type="number"]:focus,
+    select:focus {
       border-color: #fff;
       box-shadow: 0 0 29px rgba(255, 255, 255, 0.6);
       outline: none;
     }
-    input[type="number"]:hover {
+    input[type="number"]:hover,
+    select:hover {
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Option styling
+       Note: iOS Safari or other browsers might override these */
+    select option {
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      color: #fff;
     }
     
     /* PayPal Button Container: Full width for better visibility */
@@ -111,36 +139,53 @@
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      to   { opacity: 1; transform: translateY(0); }
     }
     
     /* Responsive Adjustments */
     @media (max-width: 768px) {
       h2 { font-size: 2rem; }
       label { font-size: 1rem; }
-      input[type="number"] { font-size: 1.1rem; padding: 0.8rem; }
+      input[type="number"], select {
+        font-size: 1.1rem;
+        padding: 0.8rem;
+      }
       #success-message { font-size: 1rem; }
     }
     @media (max-width: 480px) {
       .container { padding: 1.5rem; }
       h2 { font-size: 1.8rem; }
       label { font-size: 0.9rem; }
-      input[type="number"] { font-size: 1rem; padding: 0.7rem; }
+      input[type="number"], select {
+        font-size: 1rem;
+        padding: 0.7rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Let's Deposit!</h2>
+    
     <label for="amount">Amount</label>
     <input type="number" id="amount" placeholder="Type your Amount" required>
+    
+    <label for="gameName">Select Game</label>
+    <select id="gameName" required>
+      <option value="">--Select Game--</option>
+      <option value="GameVault">GameVault</option>
+      <option value="OrionStar">OrionStar</option>
+      <option value="Firekirin">Firekirin</option>
+      <option value="Juwa">Juwa</option>
+    </select>
+    
     <input type="hidden" id="userns">
     <div id="paypal-button-container"></div>
     <div id="success-message"></div>
   </div>
 
-  <!-- Load the PayPal SDK asynchronously -->
-  <script async src="https://www.paypal.com/sdk/js?client-id=AfPcLCpTYQBJvWbbehzLG6gZe7a5kNxeni2RJo-_ReDOe4GhXJEGLSb7qUK5LbCMO2FtVdZpxjWP8uA0&components=buttons,funding-eligibility&enable-funding=venmo,applepay&disable-funding=paylater"></script>
+  <!-- Load the PayPal SDK (no 'async' to help with iOS compatibility) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AfPcLCpTYQBJvWbbehzLG6gZe7a5kNxeni2RJo-_ReDOe4GhXJEGLSb7qUK5LbCMO2FtVdZpxjWP8uA0&components=buttons,funding-eligibility&enable-funding=venmo,applepay&disable-funding=paylater"></script>
 
   <script>
     // Utility: Get URL parameter by name
@@ -153,18 +198,28 @@
     document.addEventListener("DOMContentLoaded", function() {
       const userns = getQueryParam('userns') || "";
       const amountParam = getQueryParam('amount') || "";
+      const gameNameParam = getQueryParam('gameName') || "";
+      
+      // Fill hidden userns field
       document.getElementById("userns").value = userns;
+      
+      // If there's a valid number for the amount, fill it
       if (amountParam && !isNaN(amountParam)) {
         document.getElementById("amount").value = parseInt(amountParam, 10);
       }
+      // If there's a valid gameName, select it
+      if (gameNameParam) {
+        document.getElementById("gameName").value = gameNameParam;
+      }
     });
 
-    // Load PayPal buttons once the SDK is available
     function loadPayPalButtons() {
       if (!window.paypal) {
+        // Retry loading until PayPal is ready
         setTimeout(loadPayPalButtons, 100);
         return;
       }
+      
       paypal.Buttons({
         style: {
           layout: "vertical",
@@ -174,14 +229,39 @@
           tagline: false,
           height: 50
         },
+        
+        // Validate the form before createOrder
+        onClick: function(data, actions) {
+          const gameName = document.getElementById("gameName").value.trim();
+          const amount = document.getElementById("amount").value.trim();
+          
+          if (!gameName) {
+            alert("Please select a game before proceeding.");
+            return actions.reject();
+          }
+          if (!amount || isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid amount before proceeding.");
+            return actions.reject();
+          }
+          return actions.resolve();
+        },
+        
         createOrder: function(data, actions) {
+          // Retrieve the values from the form fields
+          const userns = document.getElementById("userns").value.trim();
+          const gameName = document.getElementById("gameName").value.trim();
+          const amountValue = document.getElementById("amount").value.trim() || "1";
+          
           return actions.order.create({
             intent: "CAPTURE",
             purchase_units: [{
               amount: {
-                value: document.getElementById("amount").value || "1"
+                value: amountValue
               },
-              custom_id: document.getElementById("userns").value
+              // userns in custom_id
+              custom_id: userns,
+              // game name in invoice_id (with a timestamp for uniqueness)
+              invoice_id: gameName + '-' + Date.now()
             }],
             application_context: {
               shipping_preference: "NO_SHIPPING",
@@ -207,12 +287,7 @@
 
     // Ensure both DOM and PayPal SDK are ready
     document.addEventListener("DOMContentLoaded", function() {
-      const interval = setInterval(function() {
-        if (window.paypal) {
-          clearInterval(interval);
-          loadPayPalButtons();
-        }
-      }, 100);
+      loadPayPalButtons();
     });
   </script>
 </body>
