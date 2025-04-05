@@ -5,56 +5,66 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Let's Deposit Amount</title>
-  <!-- Google Fonts -->
+  <!-- Google Fonts for modern typography -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <style>
-    /* General Styles */
+    /* Animated Gradient Background */
     body {
       font-family: 'Roboto', Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+      background-size: 600% 600%;
+      animation: gradientBG 15s ease infinite;
       color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       overflow-x: hidden;
-      touch-action: manipulation;
     }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Container Styling */
     .container {
       background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(8px);
-      border-radius: 1.5rem;
-      padding: 4%;
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      padding: 2rem;
       box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
       text-align: center;
       width: 90%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      max-width: 700px;
+      margin: 1rem;
     }
+    
     h2 {
       font-size: 2.5rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       background: linear-gradient(135deg, #FFD700, #FF4500);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    
     label {
       font-size: 1.2rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
+      display: block;
       background: linear-gradient(135deg, #ffffff, #ff00d0);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    
     input[type="number"] {
       width: 100%;
       padding: 1rem;
       font-size: 1rem;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      border-radius: 0.75rem;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 0.5rem;
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
       text-align: center;
@@ -69,20 +79,23 @@
     input[type="number"]:hover {
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
     }
-    /* PayPal Button Container */
+    
+    /* PayPal Button Container: Full width for better visibility */
     #paypal-button-container {
       margin-top: 1rem;
       width: 100%;
-      max-width: 400px;
+      /* Allow container to expand */
+      max-width: none;
     }
-    /* Success Message */
+    
+    /* Success Message Styling */
     #success-message {
       display: none;
       padding: 1rem;
-      background: rgba(0, 200, 100, 0.8);
+      background: rgba(0, 200, 100, 0.9);
       color: white;
       font-size: 1.2rem;
-      border-radius: 0.75rem;
+      border-radius: 0.5rem;
       margin-top: 1.5rem;
       text-align: center;
       animation: fadeIn 0.5s ease-in-out;
@@ -91,7 +104,8 @@
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    /* Responsive Design */
+    
+    /* Responsive Adjustments */
     @media (max-width: 768px) {
       h2 { font-size: 2rem; }
       label { font-size: 1rem; }
@@ -99,11 +113,10 @@
       #success-message { font-size: 1rem; }
     }
     @media (max-width: 480px) {
-      .container { padding: 3%; }
+      .container { padding: 1.5rem; }
       h2 { font-size: 1.8rem; }
       label { font-size: 0.9rem; }
       input[type="number"] { font-size: 0.8rem; padding: 0.7rem; }
-      #paypal-button-container { max-width: 90%; }
     }
   </style>
 </head>
@@ -117,7 +130,7 @@
     <div id="success-message"></div>
   </div>
 
-  <!-- PayPal SDK with async loading -->
+  <!-- Load the PayPal SDK asynchronously -->
   <script async src="https://www.paypal.com/sdk/js?client-id=AfPcLCpTYQBJvWbbehzLG6gZe7a5kNxeni2RJo-_ReDOe4GhXJEGLSb7qUK5LbCMO2FtVdZpxjWP8uA0&components=buttons,funding-eligibility&enable-funding=venmo,applepay&disable-funding=paylater"></script>
 
   <script>
@@ -127,7 +140,7 @@
       return params.get(param);
     }
 
-    // Autofill form fields from URL parameters when the DOM is ready
+    // Autofill form fields from URL parameters
     document.addEventListener("DOMContentLoaded", function() {
       const userns = getQueryParam('userns') || "";
       const amountParam = getQueryParam('amount') || "";
@@ -137,7 +150,7 @@
       }
     });
 
-    // Function to load PayPal buttons; waits until the SDK is loaded
+    // Load PayPal buttons once the SDK is available
     function loadPayPalButtons() {
       if (!window.paypal) {
         setTimeout(loadPayPalButtons, 100);
@@ -146,11 +159,11 @@
       paypal.Buttons({
         style: {
           layout: "vertical",
-          color: "blue",  // Options: blue, gold, silver, black, white
+          color: "blue",
           shape: "rect",
           label: "paypal",
           tagline: false,
-          height: 45
+          height: 50
         },
         createOrder: function(data, actions) {
           return actions.order.create({
@@ -170,9 +183,9 @@
         onApprove: function(data, actions) {
           return actions.order.capture().then(function(details) {
             document.getElementById("paypal-button-container").style.display = "none";
-            document.getElementById("success-message").style.display = "block";
-            document.getElementById("success-message").innerText =
-              "✅ Transaction completed by " + (details.payer.name.given_name || "Customer");
+            const successMsg = document.getElementById("success-message");
+            successMsg.style.display = "block";
+            successMsg.innerText = "✅ Transaction completed by " + (details.payer.name.given_name || "Customer");
             console.log("Order details:", details);
           });
         },
@@ -183,7 +196,7 @@
       }).render("#paypal-button-container");
     }
 
-    // Wait for both the DOM and the PayPal SDK to be ready before loading the buttons
+    // Ensure both DOM and PayPal SDK are ready
     document.addEventListener("DOMContentLoaded", function() {
       const interval = setInterval(function() {
         if (window.paypal) {
@@ -195,4 +208,3 @@
   </script>
 </body>
 </html>
-
