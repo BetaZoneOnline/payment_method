@@ -15,7 +15,7 @@
       padding: 0;
       background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
       background-size: 600% 600%;
-      animation: gradientBG 15s ease infinite;
+      animation: gradientBG 10s ease infinite;
       color: #fff;
       display: flex;
       justify-content: center;
@@ -36,53 +36,58 @@
       border-radius: 1rem;
       padding: 2rem;
       box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
-      text-align: left;
+      text-align: center;
       width: 90%;
       max-width: 700px;
       margin: 1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .container:hover {
+      transform: scale(1.02);
+      box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.4);
     }
     
     h2 {
       font-size: 2.5rem;
       margin-bottom: 1rem;
-      text-align: center;
       background: linear-gradient(135deg, #FFD700, #FF4500);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     
     label {
-      font-size: 1.4rem;
+      font-size: 2rem;
       margin-bottom: 0.5rem;
       display: block;
-      color: #fff;
-      font-weight: bold;
+      background: linear-gradient(135deg, #ffffff, #ff00d0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     
     input[type="number"] {
-      width: 100%;
-      padding: 1.2rem;
+      width: 95%;
+      padding: 1rem;
       font-size: 1.2rem;
-      border: 2px solid rgba(255, 255, 255, 0.5);
+      border: 2.5px solid rgba(255, 255, 255, 0.5);
       border-radius: 0.5rem;
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
-      text-align: left;
+      text-align: center;
       margin-bottom: 1.5rem;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      transition: border-color 0.1s ease, box-shadow 0.1s ease;
+    }
+    /* Brighter placeholder text color */
+    input[type="number"]::placeholder {
+      color: #FFD700;
+      opacity: 1;
     }
     input[type="number"]:focus {
       border-color: #fff;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+      box-shadow: 0 0 29px rgba(255, 255, 255, 0.6);
       outline: none;
     }
     input[type="number"]:hover {
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
-    }
-    ::placeholder { 
-      color: #eee;
-      font-size: 1.2rem;
-      opacity: 1;
     }
     
     /* PayPal Button Container: Full width for better visibility */
@@ -112,15 +117,15 @@
     /* Responsive Adjustments */
     @media (max-width: 768px) {
       h2 { font-size: 2rem; }
-      label { font-size: 1.2rem; }
-      input[type="number"] { font-size: 1rem; padding: 1rem; }
+      label { font-size: 1rem; }
+      input[type="number"] { font-size: 1.1rem; padding: 0.8rem; }
       #success-message { font-size: 1rem; }
     }
     @media (max-width: 480px) {
       .container { padding: 1.5rem; }
       h2 { font-size: 1.8rem; }
-      label { font-size: 1rem; }
-      input[type="number"] { font-size: 0.9rem; padding: 0.8rem; }
+      label { font-size: 0.9rem; }
+      input[type="number"] { font-size: 1rem; padding: 0.7rem; }
     }
   </style>
 </head>
